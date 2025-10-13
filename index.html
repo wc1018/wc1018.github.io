@@ -5,16 +5,29 @@
     <title>About Cheng Wu</title>
     <style>
       body {
-        background-image: url("images/akina.png");
-        background-size: cover;
-        background-position: center;
-        background-attachment: fixed;
+        position: relative;
         color: white;
         font-family: "Helvetica", "Arial", sans-serif;
         max-width: 700px;
         margin: 60px auto;
         line-height: 1.6;
+        z-index: 1; /* 文字在上层 */
       }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw;   /* 覆盖整个视口宽度 */
+        height: 100vh;  /* 覆盖整个视口高度 */
+        background-image: url("images/akina.png");
+        background-size: cover;
+        background-position: center;
+        filter: blur(8px);
+        opacity: 1;   /* 可选半透明 */
+        z-index: -1;
+      }
+      
       h1 {
         color: #3366cc;
         text-align: center;
