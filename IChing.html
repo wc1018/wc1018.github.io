@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>易经数字卦</title>
+    <style>
+      body {
+        position: relative;
+        color: white;
+        font-family: "Helvetica", "Arial", sans-serif;
+        max-width: 700px;
+        margin: 60px auto;
+        line-height: 1.6;
+        z-index: 1; /* 文字在上层 */
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw;   /* 覆盖整个视口宽度 */
+        height: 100vh;  /* 覆盖整个视口高度 */
+        background-image: url("images/akina.png");
+        background-size: cover;
+        background-position: center;
+        filter: blur(8px);
+        opacity: 1;   /* 可选半透明 */
+        z-index: -1;
+      }
+      
+      h1 {
+        color: #3366cc;
+        text-align: center;
+      }
+      p {
+        font-size: 18px;
+      }
+      a {
+        color: #cc3300;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>易经数字卦</h1>
+    <p>
+     这是一个简单的小程序，用三个三位数卜卦。 
+    </p>
+
+    <h2>按顺序输入三个三位数：</h2>
+
+    <p>
+        下卦: <input type="number" id="num1" placeholder="输入三位数">
+    </p>
+    <p>
+        上卦: <input type="number" id="num2" placeholder="输入三位数">
+    </p>
+    <p>
+        变爻: <input type="number" id="num3" placeholder="输入三位数">
+    </p>
+
+    <p>计算结果 <span id="result"></span></p>
+    <p>卦名：<span id="guaResult"></span></p>
+    <p>卦象：<span style="color: purple; font-size: 50px;" id="liuyao"></span></p>
+
+    <script>
+        const jinggua = {
+            1: "乾", 2: "兑", 3: "离", 4: "震",
+            5: "巽", 6: "坎", 7: "艮", 0: "坤"
+        };
+
+        // see https://zh.wikipedia.org/zh-hans/Template:六十四卦構成表
+        const fugua = {
+            // 上卦为坤（0）
+            "00": "坤为地 ", "70": "山地剥", "60": "水地比", "50": "风地观",
+            "40": "雷地豫", "30": "火地晋", "20": "泽地萃", "10": "天地否",
+
+            // 上卦为艮（7）
+            "07": "地山谦", "77": "艮为山", "67": "水山蹇", "57": "风山渐",
+            "47": "雷山小过", "37": "火山旅", "27": "泽山咸", "17": "天山遁",
+
+            // 上卦为坎（6）
+            "06": "地水师", "76": "山水蒙", "66": "坎为水", "56": "风水涣",
+            "46": "雷水解", "36": "火水未济", "26": "泽水困", "16": "天水讼",
+
+            // 上卦为巽（5）
+            "05": "地风升", "75": "山风蛊", "65": "水风井", "55": "巽为风",
+            "45": "雷风恒", "35": "火风鼎", "25": "泽风大过", "15": "天风姤",
+
+            // 上卦为震（4）
+            "04": "地雷复", "74": "山雷颐", "64": "水雷屯", "54": "风雷益",
+            "44": "震为雷", "34": "火雷噬嗑", "24": "泽雷随", "14": "天雷无妄",
+
+            // 上卦为离（3）
+            "03": "地火明夷", "73": "山火贲", "63": "水火既济", "53": "风火家人",
+            "43": "雷火丰", "33": "离为火", "23": "泽火革", "13": "天火同人",
+
+            // 上卦为兑（2）
+            "02": "地泽临", "72": "山泽损", "62": "水泽节", "52": "风泽中孚",
+            "42": "雷泽归妹", "32": "火泽睽", "22": "兑为泽", "12": "天泽履",
+
+            // 上卦为乾（1）
+            "01": "地天泰", "71": "山天大畜", "61": "水天需", "51": "风天小畜",
+            "41": "雷天大壮", "31": "火天大有", "21": "泽天夬", "11": "乾为天"
+        };
+        const sequence_in_IChing = {
+            "00": "02",  // 坤为地
+            "70": "23",  // 山地剥
+            "60": "08",  // 水地比
+            "50": "20",  // 风地观
+            "40": "16",  // 雷地豫
+            "30": "35",  // 火地晋
+            "20": "45",  // 泽地萃
+            "10": "12",  // 天地否
+
+            "07": "15",  // 地山谦
+            "77": "52",  // 艮为山
+            "67": "39",  // 水山蹇
+            "57": "53",  // 风山渐
+            "47": "62",  // 雷山小过
+            "37": "56",  // 火山旅
+            "27": "31",  // 泽山咸
+            "17": "33",  // 天山遁
+
+            "06": "07",  // 地水师
+            "76": "04",  // 山水蒙
+            "66": "29",  // 坎为水
+            "56": "59",  // 风水涣
+            "46": "40",  // 雷水解
+            "36": "64",  // 火水未济
+            "26": "47",  // 泽水困
+            "16": "06",  // 天水讼
+
+            "05": "46",  // 地风升
+            "75": "18",  // 山风蛊
+            "65": "48",  // 水风井
+            "55": "57",  // 巽为风
+            "45": "32",  // 雷风恒
+            "35": "50",  // 火风鼎
+            "25": "28",  // 泽风大过
+            "15": "44",  // 天风姤
+
+            "04": "24",  // 地雷复
+            "74": "27",  // 山雷颐
+            "64": "03",  // 水雷屯
+            "54": "42",  // 风雷益
+            "44": "51",  // 震为雷
+            "34": "21",  // 火雷噬嗑
+            "24": "17",  // 泽雷随
+            "14": "25",  // 天雷无妄
+
+            "03": "36",  // 地火明夷
+            "73": "22",  // 山火贲
+            "63": "63",  // 水火既济
+            "53": "37",  // 风火家人
+            "43": "55",  // 雷火丰
+            "33": "30",  // 离为火
+            "23": "49",  // 泽火革
+            "13": "13",  // 天火同人
+
+            "02": "19",  // 地泽临
+            "72": "41",  // 山泽损
+            "62": "60",  // 水泽节
+            "52": "61",  // 风泽中孚
+            "42": "54",  // 雷泽归妹
+            "32": "38",  // 火泽睽
+            "22": "58",  // 兑为泽
+            "12": "10",  // 天泽履
+
+            "01": "11",  // 地天泰
+            "71": "26",  // 山天大畜
+            "61": "05",  // 水天需
+            "51": "09",  // 风天小畜
+            "41": "34",  // 雷天大壮
+            "31": "14",  // 火天大有
+            "21": "43",  // 泽天夬
+            "11": "01"   // 乾为天
+        };
+        const inputs = [
+        document.getElementById('num1'),
+        document.getElementById('num2'),
+        document.getElementById('num3')
+        ];
+
+        const resultSpan = document.getElementById('result');
+
+        const guaResultSpan = document.getElementById('guaResult');
+
+        const liuyaoSpan = document.getElementById('liuyao');
+
+        function getGua(num1, num2) {
+            const down = jinggua[num1];
+            const up = jinggua[num2];
+            const total = fugua[`${num2}${num1}`];
+            return `上${up}下${down} → ${total}`;
+        }
+
+        function updateResults() {
+        let results = [
+            inputs[0].value ? inputs[0].value % 8 : '',
+            inputs[1].value ? inputs[1].value % 8 : '',
+            inputs[2].value ? inputs[2].value % 6 : ''
+        ];
+        // 新建 displayResults，用于显示
+        let displayResults = results.map((val, index) => {
+            if (val === 0) {
+                // 下卦、上卦（前两个元素）取 8，变爻（第三个元素）取 6
+                return index < 2 ? 8 : 6;
+            }
+            return val;
+        });
+
+        function get_unicodeChar(sequence) {
+            // sequence: 卦序号（1~64）
+            if (!sequence) return '';
+            const codePoint = 0x4DC0 + (parseInt(sequence, 10) - 1);
+            return String.fromCodePoint(codePoint);
+        }
+
+        let [num1, num2, num3] = displayResults;
+
+        resultSpan.innerText = `下: ${num1}, 上: ${num2}, 变: ${num3}`;
+        
+        // 如果前两个数字都有效，就显示卦名
+        if (results[0] !== '' && results[1] !== '') {
+            // 原有卦名显示
+            const guaText = getGua(results[0], results[1]);
+
+            // 查找卦序和 Unicode
+            const key = `${results[1]}${results[0]}`; // 数字组合作为 key
+            let sequence = '';
+            let unicodeChar = '';
+            if (sequence_in_IChing[key]) {
+                const num = sequence_in_IChing[key];
+                sequence = num;
+                // 将 U+4DC0 形式转换为实际字符
+                unicodeChar = get_unicodeChar(sequence);
+            }
+
+            // 最终显示
+            guaResultSpan.innerText = `${guaText}，卦序: ${sequence}`;
+            liuyaoSpan.innerText = `${unicodeChar}`; // 显示卦象
+        } else {
+            guaResultSpan.innerText = ''; // 清空
+        }
+       
+        }
+
+        // 给每个输入框绑定事件，输入时自动计算
+        inputs.forEach(input => {
+        input.addEventListener('input', updateResults);
+        });
+
+    </script>
+
+    <h2 style="color:rgb(60, 60, 119);"> 原理介绍 </h2>
+    <p, style="color:black;">
+        乾1，兑2，离3，震4，巽5，坎6，艮7，坤8。
+    </p>
+    <p, style="color: black;">
+        天1，泽2，火3，雷4，风5，水6，山7，地8。
+    </p>
+
+
+  </body>
+</html>
