@@ -243,7 +243,7 @@
 
             // 最终显示
             guaResultSpan.innerText = `${guaText}，卦序: ${sequence}`;
-            liuyaoSpan.innerHTML = `<a href="fugua64/${gua_name}.html" target="_blank" style="color: purple; text-decoration: none;">${unicodeChar}</a>`; // 卦象显示为链接
+            liuyaoSpan.innerHTML = `<a href="fugua64/${sequence}${gua_name}.html" target="_blank" style="color: purple; text-decoration: none;">${unicodeChar}</a>`; // 卦象显示为链接
         } else {
             guaResultSpan.innerText = ''; // 清空
         }
