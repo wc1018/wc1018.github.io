@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>乾卦</title>
+    <style>
+      body {
+        position: relative;
+        color: white;
+        font-family: "Helvetica", "Arial", sans-serif;
+        max-width: 700px;
+        margin: 60px auto;
+        line-height: 1.6;
+        z-index: 1; /* 文字在上层 */
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw;   /* 覆盖整个视口宽度 */
+        height: 100vh;  /* 覆盖整个视口高度 */
+        background-image: url("/images/akina.png");
+        background-size: cover;
+        background-position: center;
+        filter: blur(8px);
+        opacity: 1;   /* 可选半透明 */
+        z-index: -1;
+      }
+
+      h1 {
+        color: #3366cc;
+        text-align: center;
+      }
+      p {
+        font-size: 18px;
+      }
+      a {
+        color: #cc3300;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
+    
+  </head>
+  <body>
+    <h1>乾卦</h1>
+    <p>
+      乾，元亨，利贞。<br>
+      大哉乾元，万物资始，乃统天。云行雨施，品物流形。大明终始，六位时成，时乘六龙以御天。乾道变化，各正性命，保合太和，乃利贞。首出庶物，万国咸宁。<br>
+      <br>
+  </body>
+</html>

@@ -231,6 +231,7 @@
 
             // 查找卦序和 Unicode
             const key = `${results[1]}${results[0]}`; // 数字组合作为 key
+            const gua_name = fugua[key]; // 卦名
             let sequence = '';
             let unicodeChar = '';
             if (sequence_in_IChing[key]) {
@@ -242,7 +243,7 @@
 
             // 最终显示
             guaResultSpan.innerText = `${guaText}，卦序: ${sequence}`;
-            liuyaoSpan.innerText = `${unicodeChar}`; // 显示卦象
+            liuyaoSpan.innerHTML = `<a href="fugua64/${gua_name}.html" target="_blank" style="color: purple; text-decoration: none;">${unicodeChar}</a>`; // 卦象显示为链接
         } else {
             guaResultSpan.innerText = ''; // 清空
         }
